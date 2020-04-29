@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GDLocationApp</string>
+
+    <string name="title_autoreport">自动持续上报</string>
+    <string name="title_report">手动上报</string>
+    <string name="location_info">位置信息</string>
+</resources>
