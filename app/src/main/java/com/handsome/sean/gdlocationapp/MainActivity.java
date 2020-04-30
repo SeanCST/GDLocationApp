@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showLocation(AMapLocation amapLocation) {
-        Toast.makeText(this, "onLocationChanged", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "onLocationChanged", Toast.LENGTH_SHORT).show();
 
-        String result = "纬度： " + amapLocation.getLatitude() + "\n\n经度： " + amapLocation.getLongitude() + "\n\n速度： " + amapLocation.getSpeed() + " m/s";
+        String result = "纬度： " + amapLocation.getLatitude() + "  经度： " + amapLocation.getLongitude() + "  速度： " + amapLocation.getSpeed() + " m/s";
         Log.d("STATE", result);
         locationTextView.setText(result);
     }
@@ -94,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             // 按下后， 通过 MQTT 上报(设置界面的内容 + 本地时间戳 + 手机当前位置, 组合成 JSON 字符串)
             Log.d("STATE", "onReportButtonClickListener");
+
+            Log.d("STATE", "locationEnable: " + locationReportSwitch.isChecked() + " speedEnable: " + speedReportSwitch.isChecked() + " timestampEnable: " + timestampReportSwitch.isChecked());
+            //获取当前时间戳
+            long timeStamp = System.currentTimeMillis();
+            Log.d("STATE", "timeStamp：" + timeStamp);
         }
     };
 }
