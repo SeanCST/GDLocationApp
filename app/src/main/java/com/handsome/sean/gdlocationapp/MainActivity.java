@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,8 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 
+//import com.handsome.sean.gdlocationapp.
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView locationTextView;
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private Switch locationReportSwitch;
     private Switch speedReportSwitch;
     private Switch timestampReportSwitch;
+
+    private Intent mIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +84,17 @@ public class MainActivity extends AppCompatActivity {
         locationReportSwitch = findViewById(R.id.switch_location);
         speedReportSwitch = findViewById(R.id.switch_speed);
         timestampReportSwitch = findViewById(R.id.switch_timestamp);
+
+
+        mIntent = new Intent(MainActivity.this, MyMqttService.class);
+        //开启服务
+        startService(mIntent);
     }
 
     private void showLocation(AMapLocation amapLocation) {
 //        Toast.makeText(this, "onLocationChanged", Toast.LENGTH_SHORT).show();
 
-        String result = "纬度： " + amapLocation.getLatitude() + "  经度： " + amapLocation.getLongitude() + "  速度： " + amapLocation.getSpeed() + " m/s";
+        String result = "纬度： " + amapLocation.getLatitude() + "\n经度： " + amapLocation.getLongitude() + "\n速度： " + amapLocation.getSpeed() + " m/s";
         Log.d("STATE", result);
         locationTextView.setText(result);
     }
@@ -99,6 +109,17 @@ public class MainActivity extends AppCompatActivity {
             //获取当前时间戳
             long timeStamp = System.currentTimeMillis();
             Log.d("STATE", "timeStamp：" + timeStamp);
+
+            // 模拟闸机设备发送消息过来
+            MyMqttService.publish("tourist enter");
         }
     };
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //停止服务
+        stopService(mIntent);
+    }
 }
