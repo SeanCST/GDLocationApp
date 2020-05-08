@@ -27,10 +27,16 @@ public class MyMqttService extends Service {
     public final String TAG = MyMqttService.class.getSimpleName();
     private static MqttAndroidClient mqttAndroidClient;
     private MqttConnectOptions mMqttConnectOptions;
-    public        String HOST = "tcp://10.0.2.2:61613"; //服务器地址（协议+地址+端口号）
-    public        String USERNAME       = "admin"; //用户名
+//    public        String HOST = "tcp://10.0.2.2:61613"; //服务器地址（协议+地址+端口号）
+//    public        String USERNAME       = "admin"; //用户名
+//    public        String PASSWORD       = "password"; //密码
+//    public static String PUBLISH_TOPIC  = "tourist_enter"; //发布主题
+//    public static String RESPONSE_TOPIC = "message_arrived"; //响应主题
+
+    public        String HOST = "tcp://47.103.45.115:1883"; //服务器地址（协议+地址+端口号）
+    public        String USERNAME       = "itPxLOkNhEtArPtwUGUe"; //用户名
     public        String PASSWORD       = "password"; //密码
-    public static String PUBLISH_TOPIC  = "tourist_enter"; //发布主题
+    public static String PUBLISH_TOPIC  = "v1/devices/me/telemetry"; //发布主题
     public static String RESPONSE_TOPIC = "message_arrived"; //响应主题
 
     @RequiresApi(api = 26)

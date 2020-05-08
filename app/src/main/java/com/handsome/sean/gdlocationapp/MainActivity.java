@@ -20,6 +20,9 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 //import com.handsome.sean.gdlocationapp.
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch timestampReportSwitch;
 
     private Intent mIntent;
+    private AMapLocation lastAmapLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +69,11 @@ public class MainActivity extends AppCompatActivity {
                     if (amapLocation != null) {
                         if (amapLocation.getErrorCode() == 0) {
                             // 解析定位结果
-                            showLocation(amapLocation);
+                            try {
+                                showLocation(amapLocation);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -91,27 +99,54 @@ public class MainActivity extends AppCompatActivity {
         startService(mIntent);
     }
 
-    private void showLocation(AMapLocation amapLocation) {
+    private void showLocation(AMapLocation amapLocation) throws JSONException {
+        lastAmapLocation = amapLocation;
 //        Toast.makeText(this, "onLocationChanged", Toast.LENGTH_SHORT).show();
 
         String result = "纬度： " + amapLocation.getLatitude() + "\n经度： " + amapLocation.getLongitude() + "\n速度： " + amapLocation.getSpeed() + " m/s";
-        Log.d("STATE", result);
+//        Log.d("STATE", result);
         locationTextView.setText(result);
+
+        if (autoReportSwitch.isChecked()) {
+            reportCurrentInfo(amapLocation);
+        }
+    }
+
+    private void reportCurrentInfo(AMapLocation amapLocation) throws JSONException  {
+        // 按下后， 通过 MQTT 上报(设置界面的内容 + 本地时间戳 + 手机当前位置, 组合成 JSON 字符串)
+
+        if (amapLocation == null) {
+            amapLocation = lastAmapLocation;
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        if (locationReportSwitch.isChecked()) {
+            jsonObject.put("latitude", amapLocation.getLatitude());
+            jsonObject.put("longitude", amapLocation.getLongitude());
+        }
+
+        if (speedReportSwitch.isChecked()) {
+            jsonObject.put("speed", amapLocation.getSpeed());
+        }
+
+        if (timestampReportSwitch.isChecked()) {
+            long timeStamp = System.currentTimeMillis();
+            jsonObject.put("timeStamp", String.valueOf(timeStamp).substring(0, 10));
+        }
+
+        MyMqttService.publish(jsonObject.toString());
     }
 
     private View.OnClickListener onReportButtonClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // 按下后， 通过 MQTT 上报(设置界面的内容 + 本地时间戳 + 手机当前位置, 组合成 JSON 字符串)
-            Log.d("STATE", "onReportButtonClickListener");
+            Log.d("STATE", "onReportButtonClickListener —— locationEnable: " + locationReportSwitch.isChecked() + " speedEnable: " + speedReportSwitch.isChecked() + " timestampEnable: " + timestampReportSwitch.isChecked());
 
-            Log.d("STATE", "locationEnable: " + locationReportSwitch.isChecked() + " speedEnable: " + speedReportSwitch.isChecked() + " timestampEnable: " + timestampReportSwitch.isChecked());
-            //获取当前时间戳
-            long timeStamp = System.currentTimeMillis();
-            Log.d("STATE", "timeStamp：" + timeStamp);
-
-            // 模拟闸机设备发送消息过来
-            MyMqttService.publish("tourist enter");
+            try {
+                reportCurrentInfo(null);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     };
 

@@ -41,11 +41,12 @@
         android:id="@+id/switch_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="28dp"
         android:checked="true"
         android:text="位置信息"
         app:layout_constraintEnd_toEndOf="@+id/textView_setting_report_info"
-        app:layout_constraintStart_toStartOf="@+id/textView_setting_report_info"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_setting_report_info" />
 
     <Switch
